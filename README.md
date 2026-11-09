@@ -141,6 +141,136 @@ Then review:
 - `audit_repo_Explained.pdf` — explanatory guide
 - `README.md` — project overview and usage guide
 
+## Critical use cases to test
+
+These are the most important scenarios to validate before trusting the tool on a real repo:
+
+### 1. Vulnerable dependency scan
+
+Target a repo with known vulnerable libraries and confirm that:
+
+- the dependency scanner runs
+- the report includes the vulnerable package names
+- severities are ranked correctly
+- the fix guidance is understandable
+
+Example:
+
+```bash
+./audit_repo.sh https://github.com/juice-shop/juice-shop ./tmp-report
+```
+
+### 2. Secret detection in source code
+
+Use a test repo containing a fake API key, token, or private key and confirm that:
+
+- `gitleaks` or equivalent detection is triggered
+- the secret value is redacted in the output
+- the issue is treated as high severity
+- the report notes that the secret should be rotated or removed
+
+### 3. Local project folder audit
+
+Run the script against a local folder with multiple files and nested directories and confirm that:
+
+- the scan covers the correct project tree
+- the output is written to the chosen report directory
+- the overview is generated correctly
+- repo metadata is included when Git is present
+
+Example:
+
+```bash
+./audit_repo.sh ./my-project ./audit-report
+```
+
+### 4. Single file mode
+
+Run against a single source file and confirm that:
+
+- the script detects the file mode correctly
+- dependency scanners correctly report they are not applicable
+- overview output still appears
+- the report is produced without failing on missing repo metadata
+
+Example:
+
+```bash
+./audit_repo.sh ./snippet.py ./audit-report
+```
+
+### 5. Missing optional tools
+
+Temporarily uninstall or skip tools such as `trivy`, `gitleaks`, or `semgrep` and confirm that:
+
+- the script does not crash
+- the tool status file still records the missing tools
+- the report clearly marks them as skipped or unavailable
+
+This confirms the tool behaves gracefully in minimal environments.
+
+### 6. PDF generation path
+
+Ensure that the script can generate a PDF successfully when the required libraries are installed and that:
+
+- the PDF file is created
+- the output is not empty
+- the report includes summary and findings sections
+
+Example:
+
+```bash
+./audit_repo.sh ./my-project ./audit-report
+ls ./audit-report
+```
+
+### 7. Report-only mode
+
+Test a repo after a first scan by running:
+
+```bash
+REPORT_ONLY=1 ./audit_repo.sh ./my-project ./audit-report
+```
+
+Confirm that:
+
+- no new fresh scan is triggered
+- the report is rebuilt from existing data
+- the report still contains the earlier findings
+
+### 8. Build/test mode
+
+Use a controlled environment and confirm that:
+
+- `RUN_BUILD=1` triggers the build process
+- the script handles missing build tooling gracefully
+- test logs are written and available for review
+
+Example:
+
+```bash
+RUN_BUILD=1 ./audit_repo.sh ./my-project ./audit-report
+```
+
+### 9. False positive sanity check
+
+Run against a benign project and verify that:
+
+- not every warning is a real vulnerability
+- the report is readable
+- the top findings still require human review before action
+
+This protects against over-trusting automated output.
+
+### 10. Large or noisy repo test
+
+Use a large repository and confirm that:
+
+- the script completes without crashing
+- output directories remain organized
+- logging and status files remain readable
+- the PDF generation still succeeds
+
 ## Typical use cases
 
 - security review of a repository
