@@ -140,6 +140,19 @@ Then review:
 - `audit_repo.sh` — main audit script
 - `audit_repo_Explained.pdf` — explanatory guide
 - `README.md` — project overview and usage guide
+- `test/` — validation scenarios and test cases for the script
+
+## Test folder
+
+The repository includes a `test/` folder with sample scenarios intended to validate the script across common high-risk cases.
+
+Examples:
+
+```bash
+./audit_repo.sh ./test/vulnerable-deps ./audit-report
+./audit_repo.sh ./test/secret-leak ./audit-report
+./audit_repo.sh ./test/single-file-sample ./audit-report
+```
 
 ## Critical use cases to test
 
